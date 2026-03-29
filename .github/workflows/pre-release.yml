@@ -1,0 +1,26 @@
+name: Prepare Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+  sonar-check:
+    uses: ./.github/workflows/sonar-check.yml
+
+  update-parent:
+    needs: [ci, sonar-check]
+    name: Update Parent
+    runs-on: ubuntu-latest
+
+    steps:
+        # Mudar quando botar no repo principal
+      - uses: MarcyLeite/FATEC-API-5-Semestre/.github/actions/update-parent@main
+        with:
+          token: ${{ secrets.REPOSITORIES_TOKEN  }}
+          message: ${{ github.event.head_commit.message }}
+          repo-name: API_5_SEM_BACK
+          folder-name: API_5_SEM_BACK
