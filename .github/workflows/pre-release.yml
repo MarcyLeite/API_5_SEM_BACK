@@ -17,10 +17,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-        # Mudar quando botar no repo principal
-      - uses: MarcyLeite/FATEC-API-5-Semestre/.github/actions/update-parent@main
+      - name: Checkout parent repo
+        uses: actions/checkout@v4
         with:
-          token: ${{ secrets.REPOSITORIES_TOKEN  }}
-          message: ${{ github.event.head_commit.message }}
-          repo-name: API_5_SEM_BACK
-          folder-name: API_5_SEM_BACK
+          # Mudar quando botar no repo principal
+          repository: MarcyLeite/FATEC-API-5-Semestre
+          token: ${{ secrets.PARENT_REPO_PAT }}
+          submodules: true
+      
+      - name: Update submodule  
+        run: |
+          git submodule update --remote API_5_SEM_BACK
+
+      - name: Create or update PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.PARENT_REPO_PAT }}
+          branch: release
+          commit-message: "chore: update backend reference"
+          title: "Prepare Release"
+          delete-branch: true
